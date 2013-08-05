@@ -1,6 +1,8 @@
 import json
 import xlwt
 from datetime import date
+import os
+import re
 
 
 class Converter(object):
@@ -110,7 +112,22 @@ class Converter(object):
 								print "tried to overwrite."
 	def save_excel_file(self):
 		""" saves the excel file to disk """
-		self.wb.save("report.xls")
+		d = date.today()
+		report_name = 'report_%s_#1.xls' % (d)
+		PATH = "/reports"
+
+		count = 0
+		for dirname, dirnames, filenames in os.walk(PATH):
+			for filename in filenames:
+				if filename == report_name:
+					count += 1
+				if re.match(r'report_%s(\w+)' % (d), filename):
+					count += 1 
+
+		if count > 0:
+			report_name = 'report_%s_#%d.xls' % (d, count+1)
+
+		self.wb.save(os.path.join(PATH, report_name))
 
 	def get_score_title_set(self, students):
 		""" returns a set of all score titles from a set of students """
